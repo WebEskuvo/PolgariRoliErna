@@ -118,32 +118,13 @@
         return;
       }
 
-      const formData = new FormData();
-      selectedFiles.forEach(file => formData.append('media', file));
-
-      status.textContent = 'Feltöltés folyamatban...';
-
-      fetch('upload', { // Ensure the endpoint is relative
-        method: 'POST',
-        body: formData
-      })
-      .then(res => res.json())
-      .then(data => {
+      status.textContent = 'Feltöltés szimulálva...';
+      setTimeout(() => {
         status.textContent = 'Sikeres feltöltés!';
         previewContainer.innerHTML = '';
         selectedFiles = [];
-        // Frissítsd a galériát az új képekkel azonnal
-        if (data.urls && data.urls.length > 0) {
-          // Lekérjük újra a teljes galériát, hogy az ID-k és reakciók is jók legyenek
-          setTimeout(loadGallery, 500);
-        } else {
-          loadGallery();
-        }
-      })
-      .catch(err => {
-        console.error(err);
-        status.textContent = 'Hiba a feltöltés során.';
-      });
+        loadGallery(); // Refresh gallery
+      }, 1000);
     }
 
     function createGalleryItem(item, index) {
@@ -170,20 +151,14 @@
     }
 
     function loadGallery() {
-      fetch('media') // Ensure the endpoint is relative
-        .then(res => {
-          if (!res.ok) {
-            throw new Error(`HTTP error! status: ${res.status}`);
-          }
-          return res.json();
-        })
+      fetch('media.json') // Use static JSON file
+        .then(res => res.json())
         .then(media => {
-          console.log('Fetched media:', media); // Debug log
           mediaData = media;
           mediaUrls = mediaData.map(m => m.url);
           gallery.innerHTML = '';
           if (mediaData.length === 0) {
-            gallery.innerHTML = '<p class="empty-gallery">Nincs feltöltött média.</p>'; // Show message if empty
+            gallery.innerHTML = '<p class="empty-gallery">Nincs feltöltött média.</p>';
             return;
           }
           mediaData.forEach((item, index) => {
@@ -192,7 +167,7 @@
           });
         })
         .catch(err => {
-          console.error('Error fetching media:', err); // Debug log
+          console.error('Error fetching media:', err);
           gallery.innerHTML = '<p class="error-message">Hiba történt a galéria betöltésekor.</p>';
         });
     }
@@ -209,13 +184,12 @@
       const ext = url.split('.').pop().toLowerCase();
       lightboxContent.innerHTML = '';
 
-      // Create the media element (video or image)
       const media = document.createElement(ext === 'mp4' ? 'video' : 'img');
       media.src = url;
       media.className = 'lightbox-media';
 
       if (ext === 'mp4') {
-        media.controls = true; // Ensure video controls are accessible
+        media.controls = true;
         media.autoplay = true;
         media.playsInline = true;
       } else {
@@ -262,7 +236,6 @@
   </footer>
 
   <script>
-    // Set the current year in the footer
     document.getElementById('currentYear').textContent = new Date().getFullYear();
   </script>
 </body>

@@ -1,15 +1,14 @@
 [
-  "https://res.cloudinary.com/dkavjghxk/video/upload/v1745057206/feltoltott_kepek_videok/hova1rsu8ohbhl6y5vvp.mp4",
-  "https://res.cloudinary.com/dkavjghxk/image/upload/v1745057205/feltoltott_kepek_videok/qjbixmzfgyczpcgokezy.png",
-  "https://res.cloudinary.com/dkavjghxk/video/upload/v1745054007/feltoltott_kepek_videok/fqbc72vwxz9j3hm6qupd.mp4",
-  "https://res.cloudinary.com/dkavjghxk/image/upload/v1745054002/feltoltott_kepek_videok/w914xcvvk87owvnpdtkc.png",
-  "https://res.cloudinary.com/dkavjghxk/image/upload/v1745054002/feltoltott_kepek_videok/sx7xigxr3ba46bqvl6kk.png",
-  "https://res.cloudinary.com/dkavjghxk/image/upload/v1745054558/feltoltott_kepek_videok/pwmlzyhht669j1tcbkdr.png",
-  "https://res.cloudinary.com/dkavjghxk/image/upload/v1745054558/feltoltott_kepek_videok/onl6a5ulth6fj2j2gyhz.png",
-  "https://res.cloudinary.com/dkavjghxk/image/upload/v1745054836/feltoltott_kepek_videok/yg6l0m5c8ybepkgnoek1.png",
-  "https://res.cloudinary.com/dkavjghxk/image/upload/v1745054884/feltoltott_kepek_videok/zk2xtenamoehfnfh1m8v.png",
-  "https://res.cloudinary.com/dkavjghxk/image/upload/v1745054979/feltoltott_kepek_videok/v8ktqgoang7gbqylkyxp.png",
-  "https://res.cloudinary.com/dkavjghxk/image/upload/v1745055018/feltoltott_kepek_videok/jifzz7x718gglhdxfszs.png",
-  "https://res.cloudinary.com/dkavjghxk/image/upload/v1745055056/feltoltott_kepek_videok/ew9wxhmdcamlq0fya1yh.png",
-  "https://res.cloudinary.com/dkavjghxk/image/upload/v1745055127/feltoltott_kepek_videok/ezuywgogpwtjh9cms6wt.png"
+  {
+    "id": "media_0",
+    "url": "images/sample1.jpg"
+  },
+  {
+    "id": "media_1",
+    "url": "images/sample2.jpg"
+  },
+  {
+    "id": "media_2",
+    "url": "videos/sample1.mp4"
+  }
 ]
