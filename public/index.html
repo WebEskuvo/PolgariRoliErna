@@ -1,0 +1,269 @@
+<!DOCTYPE html>
+<html lang="hu">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Erna & Roland Esküvője</title>
+  <link rel="stylesheet" href="style.css">
+  <link href="https://fonts.googleapis.com/css2?family=Great+Vibes&family=Playfair+Display:wght@400;700&display=swap" rel="stylesheet">
+  <style>
+    body {
+      padding: 0;
+      background: linear-gradient(135deg, #2a2a2a 0%, #1a1a1a 100%);
+    }
+
+    .container {
+      width: 100%;
+      max-width: 1400px;
+      margin: 0 auto;
+    }
+  </style>
+</head>
+<body>
+
+  <div class="container">
+    <h1 class="page-title">Erna & Roland</h1>
+    <p class="subtitle">Polgári Esküvő Emlékei</p>
+
+    <div class="upload-section">
+      <label for="fileInput" class="file-input-wrapper">
+        <i class="fas fa-cloud-upload-alt"></i> Képek és videók választása
+      </label>
+      <input type="file" id="fileInput" multiple accept="image/*, video/*">
+    </div>
+    
+    <div id="previewContainer" class="preview-container"></div>
+    
+    <div class="upload-button-container">
+      <button onclick="uploadMedia()">
+        <span class="button-text">Feltöltés</span>
+      </button>
+    </div>
+    <div id="status"></div>
+
+    <div id="gallery" class="gallery"></div>
+  </div>
+
+  <!-- Lightbox -->
+  <div id="lightbox" class="lightbox">
+    <button class="lightbox-nav nav-prev" onclick="navigateMedia(-1)">&#10094;</button>
+    <div class="lightbox-content" id="lightboxContent"></div>
+    <button class="lightbox-nav nav-next" onclick="navigateMedia(1)">&#10095;</button>
+    <div class="lightbox-close" onclick="closeLightbox()">×</div>
+  </div>
+
+  <script>
+    const previewContainer = document.getElementById('previewContainer');
+    const fileInput = document.getElementById('fileInput');
+    const gallery = document.getElementById('gallery');
+    const status = document.getElementById('status');
+    const lightbox = document.getElementById('lightbox');
+    const lightboxContent = document.getElementById('lightboxContent');
+    
+    let selectedFiles = [];
+    let currentMediaIndex = 0;
+    let mediaUrls = [];
+    let mediaData = [];
+
+    fileInput.addEventListener('change', handleFileSelect);
+
+    function handleFileSelect(event) {
+      const newFiles = Array.from(event.target.files);
+      selectedFiles = [...selectedFiles, ...newFiles];
+      
+      // Clear the input value so the same file can be selected again
+      fileInput.value = '';
+      
+      // Add new files to preview container without clearing existing ones
+      newFiles.forEach((file, index) => {
+        const previewItem = document.createElement('div');
+        previewItem.classList.add('preview-item');
+        
+        const previewElement = file.type.startsWith('video') ? document.createElement('video') : document.createElement('img');
+        previewElement.src = URL.createObjectURL(file);
+        previewElement.alt = file.name;
+
+        if (file.type.startsWith('video')) {
+          previewElement.muted = true;
+          previewElement.playsInline = true;
+          previewItem.addEventListener('mouseenter', () => previewElement.play());
+          previewItem.addEventListener('mouseleave', () => previewElement.pause());
+        }
+
+        previewElement.onclick = () => openLightbox(URL.createObjectURL(file), 
+          file.type.startsWith('video') ? 'mp4' : 'img');
+        
+        const deleteButton = document.createElement('button');
+        deleteButton.classList.add('delete-btn');
+        deleteButton.textContent = '×';
+        deleteButton.onclick = (e) => {
+          e.stopPropagation();
+          removePreviewItem(previewItem, selectedFiles.length - newFiles.length + index);
+        };
+
+        previewItem.appendChild(previewElement);
+        previewItem.appendChild(deleteButton);
+        previewContainer.appendChild(previewItem);
+      });
+    }
+
+    function removePreviewItem(element, index) {
+      element.remove();
+      selectedFiles.splice(index, 1);
+    }
+
+    function uploadMedia() {
+      if (selectedFiles.length === 0) {
+        alert('Válassz ki legalább egy fájlt!');
+        return;
+      }
+
+      const formData = new FormData();
+      selectedFiles.forEach(file => formData.append('media', file));
+
+      status.textContent = 'Feltöltés folyamatban...';
+
+      fetch('/upload', {
+        method: 'POST',
+        body: formData
+      })
+      .then(res => res.json())
+      .then(data => {
+        status.textContent = 'Sikeres feltöltés!';
+        previewContainer.innerHTML = '';
+        selectedFiles = [];
+        // Frissítsd a galériát az új képekkel azonnal
+        if (data.urls && data.urls.length > 0) {
+          // Lekérjük újra a teljes galériát, hogy az ID-k és reakciók is jók legyenek
+          setTimeout(loadGallery, 500);
+        } else {
+          loadGallery();
+        }
+      })
+      .catch(err => {
+        console.error(err);
+        status.textContent = 'Hiba a feltöltés során.';
+      });
+    }
+
+    function createGalleryItem(item, index) {
+      const galleryItem = document.createElement('div');
+      galleryItem.classList.add('gallery-item');
+      galleryItem.dataset.mediaId = item.id;
+
+      const ext = item.url.split('.').pop().toLowerCase();
+      const mediaElement = document.createElement(ext === 'mp4' ? 'video' : 'img');
+      mediaElement.src = item.url;
+      mediaElement.loading = 'lazy';
+
+      if (ext === 'mp4') {
+        mediaElement.muted = true;
+        mediaElement.playsInline = true;
+        galleryItem.addEventListener('mouseenter', () => mediaElement.play());
+        galleryItem.addEventListener('mouseleave', () => mediaElement.pause());
+      }
+
+      mediaElement.onclick = () => openLightbox(item.url, ext, index);
+      galleryItem.appendChild(mediaElement);
+
+      return galleryItem;
+    }
+
+    function loadGallery() {
+      fetch('/media')
+        .then(res => {
+          if (!res.ok) {
+            throw new Error(`HTTP error! status: ${res.status}`);
+          }
+          return res.json();
+        })
+        .then(media => {
+          console.log('Fetched media:', media); // Debug log
+          mediaData = media;
+          mediaUrls = mediaData.map(m => m.url);
+          gallery.innerHTML = '';
+          if (mediaData.length === 0) {
+            gallery.innerHTML = '<p class="empty-gallery">Nincs feltöltött média.</p>'; // Show message if empty
+            return;
+          }
+          mediaData.forEach((item, index) => {
+            const galleryItem = createGalleryItem(item, index);
+            gallery.appendChild(galleryItem);
+          });
+        })
+        .catch(err => {
+          console.error('Error fetching media:', err); // Debug log
+          gallery.innerHTML = '<p class="error-message">Hiba történt a galéria betöltésekor.</p>';
+        });
+    }
+
+    function openLightbox(url, ext, index) {
+      currentMediaIndex = index;
+      lightbox.style.display = 'flex';
+      showCurrentMedia();
+      document.addEventListener('keydown', handleKeyPress);
+    }
+
+    function showCurrentMedia() {
+      const url = mediaUrls[currentMediaIndex];
+      const ext = url.split('.').pop().toLowerCase();
+      lightboxContent.innerHTML = '';
+
+      // Create the media element (video or image)
+      const media = document.createElement(ext === 'mp4' ? 'video' : 'img');
+      media.src = url;
+      media.className = 'lightbox-media';
+
+      if (ext === 'mp4') {
+        media.controls = true; // Ensure video controls are accessible
+        media.autoplay = true;
+        media.playsInline = true;
+      } else {
+        media.style.opacity = '0';
+        media.onload = () => {
+          media.style.transition = 'opacity 0.3s ease';
+          media.style.opacity = '1';
+        };
+      }
+
+      lightboxContent.appendChild(media);
+    }
+
+    function navigateMedia(direction) {
+      currentMediaIndex = (currentMediaIndex + direction + mediaUrls.length) % mediaUrls.length;
+      showCurrentMedia();
+    }
+
+    function handleKeyPress(e) {
+      switch(e.key) {
+        case 'Escape':
+          closeLightbox();
+          break;
+        case 'ArrowLeft':
+          navigateMedia(-1);
+          break;
+        case 'ArrowRight':
+          navigateMedia(1);
+          break;
+      }
+    }
+
+    function closeLightbox() {
+      lightbox.style.display = 'none';
+      lightboxContent.innerHTML = '';
+      document.removeEventListener('keydown', handleKeyPress);
+    }
+
+    window.addEventListener('DOMContentLoaded', loadGallery);
+  </script>
+
+  <footer style="text-align: center; margin-top: 30px; font-family: 'Playfair Display', serif; color: var(--gold-primary); font-size: 0.9em;">
+    &copy; <span id="currentYear"></span> Gergely Botond
+  </footer>
+
+  <script>
+    // Set the current year in the footer
+    document.getElementById('currentYear').textContent = new Date().getFullYear();
+  </script>
+</body>
+</html>
