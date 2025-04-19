@@ -171,6 +171,19 @@
       loadGallery(); // Frissítsd a galériát a szerverről
     }
 
+    async function deleteMedia(id) {
+      try {
+        const res = await fetch(`/media/${id}`, { method: 'DELETE' });
+        if (res.ok) {
+          loadGallery();
+        } else {
+          alert('Hiba a törlés során.');
+        }
+      } catch {
+        alert('Hiba a törlés során.');
+      }
+    }
+
     function createGalleryItem(item, index) {
       const galleryItem = document.createElement('div');
       galleryItem.classList.add('gallery-item');
@@ -190,6 +203,18 @@
 
       mediaElement.onclick = () => openLightbox(item.url, ext, index);
       galleryItem.appendChild(mediaElement);
+
+      const deleteBtn = document.createElement('button');
+      deleteBtn.className = 'delete-btn';
+      deleteBtn.textContent = '🗑️';
+      deleteBtn.title = 'Kép törlése';
+      deleteBtn.onclick = async (e) => {
+        e.stopPropagation();
+        if (window.confirm('Biztosan törlöd ezt a képet?')) {
+          await deleteMedia(item.id);
+        }
+      };
+      galleryItem.appendChild(deleteBtn);
 
       return galleryItem;
     }

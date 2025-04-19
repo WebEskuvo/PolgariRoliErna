@@ -100,6 +100,40 @@ app.get('/media', (req, res) => {
   }
 });
 
+// Képek törlése
+app.delete('/media/:id', (req, res) => {
+  const idToDelete = req.params.id;
+  let media = [];
+  try {
+    const fileData = fs.readFileSync('media.json');
+    if (fileData.length > 0) {
+      media = JSON.parse(fileData);
+    }
+  } catch (e) {
+    return res.status(500).json({ error: 'Nem sikerült beolvasni a media.json-t.' });
+  }
+
+  const item = media.find(m => m.id === idToDelete);
+  if (!item) {
+    return res.status(404).json({ error: 'Nincs ilyen média.' });
+  }
+
+  // (Opcionális) Cloudinary-ból is törlés:
+  // Ha a Cloudinary public_id-t is tárolod, akkor:
+  // await cloudinary.uploader.destroy(item.public_id);
+
+  // Törlés a listából
+  media = media.filter(m => m.id !== idToDelete);
+
+  try {
+    fs.writeFileSync('media.json', JSON.stringify(media, null, 2));
+  } catch (e) {
+    return res.status(500).json({ error: 'Nem sikerült frissíteni a media.json-t.' });
+  }
+
+  res.json({ success: true });
+});
+
 app.listen(3000, () => {
   console.log('Szerver fut a http://localhost:3000 címen');
 });
