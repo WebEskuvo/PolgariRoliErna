@@ -149,9 +149,12 @@
 
       // Add uploaded files to the gallery
       uploadedUrls.forEach(url => {
-        mediaData.push({ id: `media_${mediaData.length}`, url });
+        const newMedia = { id: `media_${mediaData.length}`, url };
+        mediaData.push(newMedia); // Add to mediaData
+        mediaUrls.push(url); // Add to mediaUrls
       });
-      loadGallery();
+
+      loadGallery(); // Refresh the gallery
     }
 
     function createGalleryItem(item, index) {
