@@ -13,9 +13,10 @@ app.use(express.static('.')); // Serve files from the current folder
 app.use(express.json());
 
 cloudinary.config({
-  cloud_name: process.env.CLOUDINARY_CLOUD_NAME,
-  api_key: process.env.CLOUDINARY_API_KEY,
-  api_secret: process.env.CLOUDINARY_API_SECRET,
+  cloud_name: 'dkavjghxk',
+  api_key: '528744698186842',
+  api_secret: '2gdHnCkGA2C9kuh0nkAimL2mCVE',
+  secure: true
 });
 
 // Több fájl feltöltése (képek és videók)
