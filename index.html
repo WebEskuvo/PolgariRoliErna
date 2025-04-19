@@ -65,6 +65,9 @@
     let mediaUrls = [];
     let mediaData = [];
 
+    const CLOUDINARY_URL = 'https://api.cloudinary.com/v1_1/YOUR_CLOUD_NAME/upload';
+    const CLOUDINARY_UPLOAD_PRESET = 'YOUR_UPLOAD_PRESET';
+
     fileInput.addEventListener('change', handleFileSelect);
 
     function handleFileSelect(event) {
@@ -112,19 +115,43 @@
       selectedFiles.splice(index, 1);
     }
 
-    function uploadMedia() {
+    async function uploadMedia() {
       if (selectedFiles.length === 0) {
         alert('Válassz ki legalább egy fájlt!');
         return;
       }
 
-      status.textContent = 'Feltöltés szimulálva...';
-      setTimeout(() => {
-        status.textContent = 'Sikeres feltöltés!';
-        previewContainer.innerHTML = '';
-        selectedFiles = [];
-        loadGallery(); // Refresh gallery
-      }, 1000);
+      status.textContent = 'Feltöltés folyamatban...';
+      const uploadedUrls = [];
+
+      for (const file of selectedFiles) {
+        const formData = new FormData();
+        formData.append('file', file);
+        formData.append('upload_preset', CLOUDINARY_UPLOAD_PRESET);
+
+        try {
+          const response = await fetch(CLOUDINARY_URL, {
+            method: 'POST',
+            body: formData
+          });
+          const data = await response.json();
+          uploadedUrls.push(data.secure_url);
+        } catch (error) {
+          console.error('Hiba a feltöltés során:', error);
+          status.textContent = 'Hiba a feltöltés során.';
+          return;
+        }
+      }
+
+      status.textContent = 'Sikeres feltöltés!';
+      selectedFiles = [];
+      previewContainer.innerHTML = '';
+
+      // Add uploaded files to the gallery
+      uploadedUrls.forEach(url => {
+        mediaData.push({ id: `media_${mediaData.length}`, url });
+      });
+      loadGallery();
     }
 
     function createGalleryItem(item, index) {
@@ -151,25 +178,15 @@
     }
 
     function loadGallery() {
-      fetch('media.json') // Use static JSON file
-        .then(res => res.json())
-        .then(media => {
-          mediaData = media;
-          mediaUrls = mediaData.map(m => m.url);
-          gallery.innerHTML = '';
-          if (mediaData.length === 0) {
-            gallery.innerHTML = '<p class="empty-gallery">Nincs feltöltött média.</p>';
-            return;
-          }
-          mediaData.forEach((item, index) => {
-            const galleryItem = createGalleryItem(item, index);
-            gallery.appendChild(galleryItem);
-          });
-        })
-        .catch(err => {
-          console.error('Error fetching media:', err);
-          gallery.innerHTML = '<p class="error-message">Hiba történt a galéria betöltésekor.</p>';
-        });
+      gallery.innerHTML = '';
+      if (mediaData.length === 0) {
+        gallery.innerHTML = '<p class="empty-gallery">Nincs feltöltött média.</p>';
+        return;
+      }
+      mediaData.forEach((item, index) => {
+        const galleryItem = createGalleryItem(item, index);
+        gallery.appendChild(galleryItem);
+      });
     }
 
     function openLightbox(url, ext, index) {
