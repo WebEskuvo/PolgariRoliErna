@@ -9,7 +9,7 @@ const app = express();
 const upload = multer({ storage: multer.memoryStorage() });
 
 app.use(cors());
-app.use(express.static('public'));
+app.use(express.static('.')); // Serve files from the current folder
 app.use(express.json());
 
 cloudinary.config({
@@ -38,7 +38,7 @@ app.post('/upload', upload.array('media', 10), (req, res) => {
       // Olvasd be az aktuális listát
       let existingMedia = [];
       try {
-        const fileData = fs.readFileSync('media.json');
+        const fileData = fs.readFileSync('media.json'); // Ensure the file is in the same folder
         if (fileData.length > 0) {
           existingMedia = JSON.parse(fileData);
         }
@@ -50,7 +50,7 @@ app.post('/upload', upload.array('media', 10), (req, res) => {
       existingMedia = [...newMedia, ...existingMedia];
 
       // Írjuk vissza a frissített listát a fájlba
-      fs.writeFileSync('media.json', JSON.stringify(existingMedia, null, 2));
+      fs.writeFileSync('media.json', JSON.stringify(existingMedia, null, 2)); // Ensure the file is in the same folder
       console.log('Új fájlok mentve:', newMedia);
 
       // Válasz a sikeres feltöltésről
@@ -67,7 +67,7 @@ app.get('/media', (req, res) => {
   try {
     let media = [];
     try {
-      const fileData = fs.readFileSync('media.json');
+      const fileData = fs.readFileSync('media.json'); // Ensure the file is in the same folder
       if (fileData.length > 0) {
         media = JSON.parse(fileData);
       } else {
