@@ -285,8 +285,8 @@ button[onclick="uploadMedia"] {
   position: fixed;
   top: 0;
   left: 0;
-  width: 100%;
-  height: 100%;
+  width: 100vw;
+  height: 100vh;
   background-color: rgba(20, 20, 20, 0.97);
   backdrop-filter: blur(8px);
   z-index: 1000;
@@ -301,14 +301,17 @@ button[onclick="uploadMedia"] {
   display: flex;
   justify-content: center;
   align-items: center;
-  width: 90vw;
-  height: 90vh;
-  margin: auto;
-  margin-top: -20px; /* Move lightbox content slightly higher */
+  width: 100vw;
+  height: 100vh;
+  max-width: 100vw;
+  max-height: 100vh;
+  margin: 0;
+  overflow: hidden;
+  box-sizing: border-box;
 }
 
 .lightbox-media {
-  max-width: 90vw;
+  max-width: 96vw;
   max-height: 90vh;
   width: auto;
   height: auto;
@@ -316,6 +319,9 @@ button[onclick="uploadMedia"] {
   border: 3px solid var(--shadow-gold);
   border-radius: 8px;
   box-shadow: 0 0 30px rgba(212, 175, 55, 0.15);
+  background: #111;
+  display: block;
+  margin: 0 auto;
 }
 
 lightbox video {
@@ -415,13 +421,17 @@ lightbox-nav:hover {
   }
 
   .lightbox-content {
-    width: 95vw; /* Adjust lightbox width for mobile */
-    height: 85vh; /* Adjust lightbox height for mobile */
+    width: 100vw;
+    height: 100vh;
+    max-width: 100vw;
+    max-height: 100vh;
+    margin: 0;
+    overflow: hidden;
   }
 
   .lightbox-media {
-    max-width: 95vw; /* Ensure media fits within the screen */
-    max-height: 85vh;
+    max-width: 98vw;
+    max-height: 80vh;
   }
 
   .lightbox-close {

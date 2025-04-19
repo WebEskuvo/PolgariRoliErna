@@ -64,6 +64,7 @@
     let currentMediaIndex = 0;
     let mediaUrls = [];
     let mediaData = [];
+    let touchStartX = null;
 
     const CLOUDINARY_URL = 'https://api.cloudinary.com/v1_1/dkavjghxk/upload'; // Cloudinary upload endpoint
     const CLOUDINARY_UPLOAD_PRESET = 'ml_default'; // Cloudinary upload preset
@@ -240,11 +241,42 @@
         });
     }
 
+    function addLightboxSwipeListeners() {
+      lightboxContent.addEventListener('touchstart', handleTouchStart, { passive: true });
+      lightboxContent.addEventListener('touchend', handleTouchEnd, { passive: true });
+    }
+
+    function removeLightboxSwipeListeners() {
+      lightboxContent.removeEventListener('touchstart', handleTouchStart);
+      lightboxContent.removeEventListener('touchend', handleTouchEnd);
+    }
+
+    function handleTouchStart(e) {
+      if (e.touches && e.touches.length === 1) {
+        touchStartX = e.touches[0].clientX;
+      }
+    }
+
+    function handleTouchEnd(e) {
+      if (touchStartX === null) return;
+      const touchEndX = e.changedTouches[0].clientX;
+      const diffX = touchEndX - touchStartX;
+      if (Math.abs(diffX) > 50) { // threshold in px
+        if (diffX > 0) {
+          navigateMedia(-1); // swipe right: previous
+        } else {
+          navigateMedia(1); // swipe left: next
+        }
+      }
+      touchStartX = null;
+    }
+
     function openLightbox(url, ext, index) {
       currentMediaIndex = index;
       lightbox.style.display = 'flex';
       showCurrentMedia();
       document.addEventListener('keydown', handleKeyPress);
+      addLightboxSwipeListeners(); // swipe támogatás
     }
 
     function showCurrentMedia() {
@@ -294,6 +326,7 @@
       lightbox.style.display = 'none';
       lightboxContent.innerHTML = '';
       document.removeEventListener('keydown', handleKeyPress);
+      removeLightboxSwipeListeners(); // swipe események eltávolítása
     }
 
     window.addEventListener('DOMContentLoaded', loadGallery);
