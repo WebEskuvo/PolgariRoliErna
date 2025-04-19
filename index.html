@@ -67,7 +67,6 @@
 
     const CLOUDINARY_URL = 'https://api.cloudinary.com/v1_1/dkavjghxk/upload'; // Cloudinary upload endpoint
     const CLOUDINARY_UPLOAD_PRESET = 'ml_default'; // Cloudinary upload preset
-    const CLOUDINARY_API_KEY = '528744698186842'; // Cloudinary API key
 
     fileInput.addEventListener('change', handleFileSelect);
 
@@ -129,8 +128,6 @@
         const formData = new FormData();
         formData.append('file', file);
         formData.append('upload_preset', CLOUDINARY_UPLOAD_PRESET);
-        formData.append('api_key', CLOUDINARY_API_KEY);
-        formData.append('timestamp', Math.floor(Date.now() / 1000));
 
         try {
           console.log('Uploading file to Cloudinary:', file.name); // Debug log
