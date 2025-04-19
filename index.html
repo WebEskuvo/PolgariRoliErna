@@ -65,8 +65,8 @@
     let mediaUrls = [];
     let mediaData = [];
 
-    const CLOUDINARY_URL = 'https://api.cloudinary.com/v1_1/YOUR_CLOUD_NAME/upload';
-    const CLOUDINARY_UPLOAD_PRESET = 'YOUR_UPLOAD_PRESET';
+    const CLOUDINARY_URL = 'https://api.cloudinary.com/v1_1/dkavjghxk/upload';
+    const CLOUDINARY_UPLOAD_PRESET = 'ml_default';
 
     fileInput.addEventListener('change', handleFileSelect);
 
@@ -130,12 +130,24 @@
         formData.append('upload_preset', CLOUDINARY_UPLOAD_PRESET);
 
         try {
+          console.log('Uploading file to Cloudinary:', file.name); // Debug log
           const response = await fetch(CLOUDINARY_URL, {
             method: 'POST',
             body: formData
           });
+
+          if (!response.ok) {
+            throw new Error(`Cloudinary upload failed: ${response.statusText}`);
+          }
+
           const data = await response.json();
-          uploadedUrls.push(data.secure_url);
+          console.log('Cloudinary response:', data); // Debug log
+
+          if (data.secure_url) {
+            uploadedUrls.push(data.secure_url);
+          } else {
+            throw new Error('Cloudinary did not return a secure_url.');
+          }
         } catch (error) {
           console.error('Hiba a feltöltés során:', error);
           status.textContent = 'Hiba a feltöltés során.';
