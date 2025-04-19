@@ -78,6 +78,14 @@ app.get('/media', (req, res) => {
       const fileData = fs.readFileSync('media.json');
       if (fileData.length > 0) {
         media = JSON.parse(fileData);
+        // Javítás: alakítsd át a sima stringeket objektummá
+        media = media.map((item, idx) => {
+          if (typeof item === 'string') {
+            return { id: `media_${idx}`, url: item };
+          }
+          // ha már objektum, hagyd úgy
+          return item;
+        });
       } else {
         console.log('media.json is empty.');
       }
@@ -85,7 +93,6 @@ app.get('/media', (req, res) => {
       console.error('Error reading media.json:', e);
     }
 
-    // Itt már nem kell átalakítani, mert az objektumokat tároljuk
     res.json(media);
   } catch (e) {
     console.error('Error processing /media endpoint:', e);
