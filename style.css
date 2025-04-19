@@ -322,8 +322,8 @@ lightbox video {
   background-color: #000;
 }
 
-lightbox-close {
-  position: fixed;
+.lightbox-close {
+  position: absolute; /* Fix: legyen absolute, ne fixed */
   top: 20px;
   right: 20px;
   width: 40px;
@@ -338,6 +338,7 @@ lightbox-close {
   font-size: 24px;
   transition: all 0.3s ease;
   box-shadow: 0 0 15px rgba(0, 0, 0, 0.3);
+  z-index: 1100; /* Fix: legyen a lightbox fölött */
 }
 
 lightbox-close:hover {
@@ -424,9 +425,11 @@ lightbox-nav:hover {
   }
 
   .lightbox-close {
-    top: 10px; /* Adjust close button position */
+    position: absolute; /* Fix: legyen absolute, ne fixed */
+    top: 10px;
     right: 10px;
     font-size: 20px; /* Smaller close button */
+    z-index: 1100;
   }
 
   .lightbox-nav {
