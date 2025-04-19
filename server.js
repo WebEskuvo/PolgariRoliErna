@@ -22,30 +22,37 @@ cloudinary.config({
 // Több fájl feltöltése (képek és videók)
 app.post('/upload', upload.array('media', 10), async (req, res) => {
   let newMedia = [];
-  // Ha a kliens csak URL-eket küld (Cloudinary feltöltés után)
   if (req.files.length === 0 && req.body.media) {
     // req.body.media lehet string vagy tömb
     if (Array.isArray(req.body.media)) {
-      newMedia = req.body.media;
+      newMedia = req.body.media.map((url, i) => ({
+        id: `media_${Date.now()}_${i}`,
+        url
+      }));
     } else {
-      newMedia = [req.body.media];
+      newMedia = [{
+        id: `media_${Date.now()}_0`,
+        url: req.body.media
+      }];
     }
   } else {
-    // Feltöltés Cloudinary-ra anélkül, hogy átméretezné vagy módosítaná a fájlokat
-    newMedia = await Promise.all(req.files.map(async file => {
+    newMedia = await Promise.all(req.files.map(async (file, i) => {
       const fileStr = file.buffer.toString('base64');
       const result = await cloudinary.uploader.upload(`data:${file.mimetype};base64,${fileStr}`, {
-        folder: 'feltoltott_kepek_videok', // A fájlok mentése egy mappába
-        resource_type: file.mimetype.startsWith('video') ? 'video' : 'image', // Fájl típusa (kép vagy videó)
+        folder: 'feltoltott_kepek_videok',
+        resource_type: file.mimetype.startsWith('video') ? 'video' : 'image',
       });
-      return result.secure_url;
+      return {
+        id: `media_${Date.now()}_${i}`,
+        url: result.secure_url
+      };
     }));
   }
 
   // Olvasd be az aktuális listát
   let existingMedia = [];
   try {
-    const fileData = fs.readFileSync('media.json'); // Ensure the file is in the same folder
+    const fileData = fs.readFileSync('media.json');
     if (fileData.length > 0) {
       existingMedia = JSON.parse(fileData);
     }
@@ -57,11 +64,10 @@ app.post('/upload', upload.array('media', 10), async (req, res) => {
   existingMedia = [...newMedia, ...existingMedia];
 
   // Írjuk vissza a frissített listát a fájlba
-  fs.writeFileSync('media.json', JSON.stringify(existingMedia, null, 2)); // Ensure the file is in the same folder
+  fs.writeFileSync('media.json', JSON.stringify(existingMedia, null, 2));
   console.log('Új fájlok mentve:', newMedia);
 
-  // Válasz a sikeres feltöltésről
-  res.json({ urls: newMedia });
+  res.json({ urls: newMedia.map(m => m.url) });
 });
 
 // Képek és videók listázása
@@ -69,7 +75,7 @@ app.get('/media', (req, res) => {
   try {
     let media = [];
     try {
-      const fileData = fs.readFileSync('media.json'); // Ensure the file is in the same folder
+      const fileData = fs.readFileSync('media.json');
       if (fileData.length > 0) {
         media = JSON.parse(fileData);
       } else {
@@ -79,13 +85,8 @@ app.get('/media', (req, res) => {
       console.error('Error reading media.json:', e);
     }
 
-    const mediaWithIds = media.map((url, index) => ({
-      id: `media_${index}`,
-      url
-    }));
-
-    console.log('Media:', mediaWithIds); // Debug log
-    res.json(mediaWithIds);
+    // Itt már nem kell átalakítani, mert az objektumokat tároljuk
+    res.json(media);
   } catch (e) {
     console.error('Error processing /media endpoint:', e);
     res.status(500).json({ error: 'Error processing /media endpoint.' });
