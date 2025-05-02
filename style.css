@@ -14,6 +14,24 @@
   --bg-dark: #1c1c1c;
   --bg-darker: #141414;
   --shadow-gold: rgba(191, 155, 48, 0.2);
+
+  /* Add color scheme protection */
+  color-scheme: light dark;
+  forced-color-adjust: none;
+  -webkit-font-smoothing: antialiased;
+}
+
+/* Force dark theme colors */
+@media (prefers-color-scheme: light) {
+  :root {
+    --bg-dark: #1c1c1c;
+    --bg-darker: #141414;
+  }
+}
+
+/* Ensure consistent background */
+html {
+  background: var(--bg-darker);
 }
 
 body {
@@ -22,6 +40,11 @@ body {
   min-height: 100vh;
   color: var(--gold-primary);
   padding: 20px;
+
+  /* Add these properties */
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  background-attachment: fixed;
 }
 
 .container {
@@ -29,12 +52,13 @@ body {
   width: 100%;
   margin: 0 auto;
   padding: 50px;
-  background: linear-gradient(145deg, rgba(35, 35, 35, 0.95), rgba(20, 20, 20, 0.98));
+  background: linear-gradient(145deg, rgba(35, 35, 35, 0.98), rgba(20, 20, 20, 0.99));
   border: 1px solid var(--shadow-gold);
   box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3),
               0 0 40px var(--shadow-gold);
   border-radius: 20px;
-  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: none;
+  backdrop-filter: none;
 }
 
 .page-title {
@@ -47,6 +71,8 @@ body {
   font-family: 'Great Vibes', cursive;
   text-shadow: 2px 4px 8px rgba(0, 0, 0, 0.3);
   letter-spacing: 4px;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
 }
 
 .subtitle {
@@ -58,6 +84,8 @@ body {
   font-style: italic;
   letter-spacing: 2px;
   opacity: 0.9;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
 }
 
 h1, h2 {
@@ -85,6 +113,8 @@ button, .file-input-wrapper {
   transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
   margin: 20px 0;
   box-shadow: 0 4px 15px var(--shadow-gold);
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
 }
 
 button:hover, .file-input-wrapper:hover {
@@ -99,6 +129,8 @@ button:hover, .file-input-wrapper:hover {
   font-size: 1.2rem;
   font-family: 'Playfair Display', serif;
   color: var(--gold-primary);
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
 }
 
 .upload-section {
@@ -167,9 +199,11 @@ button[onclick="uploadMedia"] {
   width: 100%;
   height: 100%;
   object-fit: contain;
-  background-color: rgba(0, 0, 0, 0.8);
+  background-color: rgba(0, 0, 0, 0.8) !important;
   padding: 5px;
   cursor: pointer;
+  -webkit-backdrop-filter: none;
+  backdrop-filter: none;
 }
 
 .delete-btn {
@@ -261,10 +295,12 @@ button[onclick="uploadMedia"] {
   height: auto;
   aspect-ratio: 4/3;
   object-fit: contain; /* Changed from cover to contain */
-  background-color: rgba(0,0,0,0.8);
+  background-color: rgba(0,0,0,0.8) !important;
   border-radius: 0;
   padding: 8px; /* Added padding to prevent image from touching borders */
   transition: transform 0.3s;
+  -webkit-backdrop-filter: none;
+  backdrop-filter: none;
 }
 
 .gallery-item:hover {
@@ -309,6 +345,8 @@ button[onclick="uploadMedia"] {
   font-size: 1.5em;
   color: var(--gold-secondary);
   margin-top: 20px;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
 }
 
 .error-message {
@@ -316,6 +354,8 @@ button[onclick="uploadMedia"] {
   font-size: 1.5em;
   color: red;
   margin-top: 20px;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
 }
 
 .lightbox {
@@ -324,8 +364,8 @@ button[onclick="uploadMedia"] {
   left: 0;
   width: 100vw;
   height: 100vh;
-  background-color: rgba(20, 20, 20, 0.97);
-  backdrop-filter: blur(8px);
+  background-color: rgba(20, 20, 20, 0.98) !important;
+  backdrop-filter: none;
   z-index: 1000;
   display: none;
   justify-content: center;
@@ -359,6 +399,9 @@ button[onclick="uploadMedia"] {
   background: #111;
   display: block;
   margin: 0 auto;
+  background-color: rgba(0, 0, 0, 0.8) !important;
+  -webkit-backdrop-filter: none;
+  backdrop-filter: none;
 }
 
 lightbox video {
