@@ -260,10 +260,10 @@ button[onclick="uploadMedia"] {
   width: 100%;
   height: auto;
   aspect-ratio: 4/3;
-  object-fit: cover;
+  object-fit: contain; /* Changed from cover to contain */
   background-color: rgba(0,0,0,0.8);
   border-radius: 0;
-  padding: 0;
+  padding: 8px; /* Added padding to prevent image from touching borders */
   transition: transform 0.3s;
 }
 
@@ -282,15 +282,18 @@ button[onclick="uploadMedia"] {
 @media (max-width: 900px) {
   .gallery {
     grid-template-columns: repeat(auto-fill, minmax(160px, 1fr));
-    gap: 10px;
+    gap: 12px; /* Increased gap for better spacing */
     padding: 10px 0;
   }
-  .gallery-item .delete-btn {
-    width: 22px;
-    height: 22px;
-    font-size: 14px;
-    top: 6px;
-    right: 6px;
+  
+  .gallery-item {
+    min-height: auto; /* Remove fixed height constraint */
+    aspect-ratio: 4/3; /* Maintain aspect ratio */
+  }
+
+  .gallery-item img,
+  .gallery-item video {
+    padding: 4px; /* Smaller padding on mobile */
   }
 }
 
