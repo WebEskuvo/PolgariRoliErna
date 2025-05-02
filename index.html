@@ -205,18 +205,6 @@
       mediaElement.onclick = () => openLightbox(item.url, ext, index);
       galleryItem.appendChild(mediaElement);
 
-      const deleteBtn = document.createElement('button');
-      deleteBtn.className = 'delete-btn';
-      deleteBtn.textContent = '🗑️';
-      deleteBtn.title = 'Kép törlése';
-      deleteBtn.onclick = async (e) => {
-        e.stopPropagation();
-        if (window.confirm('Biztosan törlöd ezt a képet?')) {
-          await deleteMedia(item.id);
-        }
-      };
-      galleryItem.appendChild(deleteBtn);
-
       return galleryItem;
     }
 
